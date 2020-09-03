@@ -1,0 +1,354 @@
+# basic
+
+	vimtutor
+starts vim editing a copy of a tutorial file -- very good.
+	i
+insert mode. Next keys typed are inserted into the file.
+	<Esc>
+Escape from insert mode so you can navigate and use edit commands
+	h j k l
+move cursor ( h: ←  j: ↓  k: ↑  l: → )
+	A
+Append at end of line
+	o
+Insert at new line below
+	u
+undo last command, again and again
+	x
+delete character under cursor
+	dw
+delete everything right from the cursor to the start of next word (and put it into the default register)
+	dd
+delete line (and put it into the default register)
+	p
+paste the default register
+	/myname
+search forward for myname
+	:wq
+write and quit
+	:x
+write and quit
+	:w filename
+write a copy of the file you are editing as filename
+	:q!
+quit without saving even if changes were made!
+	:help
+display help
+	<Tab>
+use tab completion to scroll through commands that start with what you typed
+	v
+visual mode -- use to select text with cursor movement or mouse
+	y
+use to yank (copy) what was selected
+	<Esc>
+esc gets you back to the main mode
+	^ w e $
+bigger movements: beginning of line, word, end of word, end of line
+	c
+starts a change command
+	C
+change to end of line (same as c$)
+	ce
+change to end of word (a complete change command)
+
+# explore
+
+	:Ex
+file explorer note capital Ex
+	\be
+show buffer explorer (requires plugin)
+	:ls
+list of buffers (eg following)
+	:cd ..
+move to parent directory
+
+# misc editing
+
+	guu
+lowercase line
+	gUU
+uppercase line
+	~
+invert case (upper->lower; lower->upper) of current character
+	gf
+open file name under cursor (SUPER)
+	ga
+display hex, ascii value of character under cursor
+	g8
+display hex value of utf-8 character under cursor
+	ggg?G
+rot13 whole file
+	xp
+swap next two characters around
+	CTRL-A,CTRL-X
+increment, decrement next number on same line as the cursor
+	CTRL-R=5*5
+insert 25 into text
+	=
+: (re)indent the text on the current line or on the area selected
+	=%
+(re)indent the current braces { ... }
+	G=gg
+auto (re)indent entire document
+
+# easter eggs
+
+	:help 42
+	:help holy-grail
+	:help!
+	:help map-modes (see comment below the table about :nunmap)
+	:help UserGettingBored
+	:help spoon
+	:help showmatch (read the note)
+	:Ni!
+	:help bar
+
+# movement
+
+	'.
+jump to last modification line
+	`.
+jump to exact spot in last modification line
+	<C-O>
+retrace your movements in file (backward)
+	<C-I>
+retrace your movements in file (forward)
+	:ju(mps)
+list of your movements {{help|jump-motions}}
+
+# maps
+
+	:map <F7>  :'a,'bw file
+Write the lines from mark a to mark b to 'file'
+	:map <F8>  :.w file<CR>
+Write the current line to 'file'
+	:map <F9>  :r file
+Read text from 'file' and insert it below the current line
+	:map <F10> :w<CR>:!php %<CR>
+Write the file and run it through php
+	:ab php
+list abbreviations beginning with php
+	:map \
+list maps beginning with \
+
+# registers
+
+	:reg
+display contents of all registers
+	"1p
+paste from register 1
+
+# shell interaction
+
+	:r!ls
+reads in output of ls (use dir on Windows)
+	:r !grep "^ebay" file.txt
+read output of grep
+	:20,25 !rot13
+rot13 lines 20 to 25
+	:r!date
+insert date (use  date /T on Windows)
+	:.!sh
+execute contents of current line in buffer and capture the output
+
+Entering !! in normal mode is translated to  :.!
+Appending a command to :.! sends the current line to the command replacing it with command's result
+
+	!!date
+Replace current line with date
+	!!which command
+Replace current line with the absolute path to command
+	!!tr -d AEIO
+translate current line deleting As, Es, Is, and Os from the current line
+
+You can use ! on a visual selection. Select an area with one of the visual mode commands, and then type !command to pipe the whole selection through command. This is equivalent to :'<,'>!command.
+
+	:%!sort -u
+contents of the current file is sorted and only unique lines are kept
+	:'v,'w!sort
+sort from line marked v thru lines marked w
+	:g/^$/;,/^$/-1!sort
+sort each block (note the crucial ;)
+	!1} sort
+sorts paragraph; this is issued from normal mode!)
+	!sort
+sort selected lines
+	!grep word
+keep only lines containing 'word' in the selected range.
+
+# multiple files
+
+	:wn
+write file and move to next (SUPER)
+	:bd
+remove file from buffer list (SUPER)
+	:sav php.html
+Save current file as php.html and "move" to php.html
+	:sp fred.txt
+open fred.txt into a split
+	:e!
+return to unmodified file
+	:w /some/path/%:r
+save file in another directory, but with the same name
+	:e #
+edit alternative file
+	:args
+display argument list
+	:n
+next file in argument list
+	:prev
+previous file in argument list
+	:rew
+rewind to first file in argument list
+	:ls
+display buffer list
+	:bn
+next buffer
+	:bp
+previous buffer
+	:brew
+rewind to first buffer in buffer list
+	:tabe
+open new tab page (Ctrl-PgUp, Ctrl-PgDown for next/previous tab)
+	:tabm n
+move tab to position n (0=leftmost position)
+
+# recording
+
+	qa
+record keystrokes to register "a"
+	q
+quit recording
+	@a
+execute commands again in "a"
+
+# vimrc essentials
+
+	:set incsearch
+jumps to search word as you type (annoying but excellent)
+	:set wildignore=*.o,*.obj,*.bak,*.exe
+should be obvious
+	:syntax on
+display syntactical elements by color based on filetype (extension)
+
+# searching
+
+	/^fred.*joe.*bill
+line beginning with fred, followed by joe then bill
+	/^[A-J]
+line beginning A-J
+	/^[A-J][a-z]\+\s
+line beginning A-J then one or more lowercase characters then space or tab
+	/fred\_.\{-}joe
+fred then anything then joe (over multiple lines)
+	/fred\_s\{-}joe
+fred then any whitespace (including newlines) then joe
+	/fred\|joe
+fred OR joe
+
+# substitution
+
+	:%s/^\(.*\)\n\(\1\n\)*/\1\r/
+delete multiple adjacent duplicate lines
+	:%s/fred/joe/igc
+general substitute command
+	:%s/\r//g
+delete DOS Carriage Returns (^M)
+	:'a,'bg/fred/s/dick/joe/gc
+VERY USEFUL
+	:s/\(.*\):\(.*\)/\2 : \1/
+reverse fields separated by :
+
+:s/fred/<c-r>a/g
+substitute "fred" with contents of register "a"
+:%s/^\(.*\)\n\1/\1$/
+delete duplicate lines
+
+# Global command
+
+	:g/one\|two/
+list lines containing "one" or "two"
+	:g/^\s*$/d
+delete all blank lines
+	:g/green/d
+delete all lines containing "green"
+	:v/green/d
+delete all lines not containing "green"
+	:g/one/,/two/d
+not line based
+	:v/./.,/./-1join
+compress empty lines
+
+# Formatting text
+
+	gq<CR>
+format text.
+	gqap
+(a is motion p paragraph (visual mode))
+
+# Operate command over multiple files
+
+	:bufdo %s/foo/bar/
+execute %s/foo/bar/ over buffer
+	:windo %s/foo/bar/
+execute %s/foo/bar/ over window
+	:tabdo %s/foo/bar/
+execute %s/foo/bar/ over tab
+
+# Help for help
+
+	:h visual<C-D><Tab>
+obtain list of all visual help topic, then use tab to step through them
+	:h ctrl<C-D>
+list help of all control keys
+	:h :r
+help for :ex command
+	:h CTRL-R
+normal mode
+	:h \r
+what's \r in a regexp
+	:h i_CTRL-R
+help for say <C-R> in insert mode
+	:h c_CTRL-R
+help for say <C-R> in command mode
+	:h v_CTRL-V
+visual mode
+	:h 'ai
+help on setting option 'autoindent'
+
+# lines in buffer
+
+	:%! nl -ba
+number the lines in the file
+	:%!cat -n
+number the lines in the file
+
+To display how many lines are in the current buffer, type Ctrl-g (or g then Ctrl-g for more information).
+
+# misc
+
+	* # g* g#
+find word under cursor (forwards/backwards)
+	%
+match brackets {}[]()
+	matchit.vim
+% now matches HTML tags <tr><td><script> etc
+	<C-N> <C-P>
+word completion in insert mode
+	<C-X><C-L>
+Line complete SUPER USEFUL
+	/<C-R><C-W>
+Pull <cword> onto search/command line
+	:set ignorecase
+you nearly always want this
+	:set smartcase
+case-sensitive if search contains an uppercase character
+	:syntax on
+colour syntax in Perl,HTML,PHP etc
+	:h slash<C-D>
+type control-D and get a list all help topics containing slash (plus use TAB for Help completion)
+	:history
+list of all your commands
+	"ayy@a
+execute the Vim command in the current line
+
