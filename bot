@@ -1,0 +1,160 @@
+#!/usr/bin/env python3
+
+import asyncio
+import config
+import datetime
+import handlers
+import os
+import out
+import pydle
+import secrets
+import sys
+import time
+import traceback
+
+from misc import whoami
+
+class SIGSEGV(pydle.Client):
+    async def on_connect(self):
+        await super().on_connect()
+
+        self.log('irc', 'connected!')
+
+        self.fndata = {}
+        self.modules = {}
+        self.help = {}
+        self.userinfo = {}
+        self.aliases = {}
+
+        # handle commands, raw PRIVMSGs,
+        # and messages that match a regex,
+        # respectively.
+        self.handle_cmd = {}
+        self.handle_raw = {}
+        self.handle_reg = {}
+
+        # HACK: avoid executing commands from
+        # channel history playback
+        self.ignore_cmd = 0
+
+        self.log('modules', 'loading modules...')
+        await self.load_mods()
+        self.log('irc', 'joining channels')
+        for i in config.initial_chans:
+            await self.join(i)
+        self.log('irc', 'done!')
+
+        if config.set_botmode:
+            self.log('irc', 'attempting to set mode +B')
+            await self.set_mode(self.nickname, '+B')
+
+    async def load_mods(self):
+        for i in [s for s in os.listdir('mod') if '.py' in s]:
+            i = i[:-3]
+            self.log('modules', f'loading {i}')
+            m = __import__('mod.' + i)
+            m = eval('m.' + i)
+            await m.init(self)
+            self.modules[i] = m
+
+    async def on_join(self, chan, by):
+        await super().on_join(chan, by)
+
+        if by == self.nickname:
+            self.ignore_cmd = time.time() + 3
+
+    async def on_invite(self, chan, by):
+        await super().on_invite(chan, by)
+
+        self.log('irc', 'received invite by {} to {}'.format(by, chan))
+
+        if config.join_on_invite:
+            if chan not in config.bannedchans:
+                await self.join(chan)
+
+    async def on_channel_message(self, chan, source, msg):
+        await super().on_message(chan, source, msg)
+
+        # ignore channel playback on channels that have
+        # mode +H (only on ircv3 servers)
+        if not time.time() > self.ignore_cmd:
+            return
+
+        for i in self.handle_raw:
+            await self.handle_raw[i](self, chan, source, msg)
+
+        if source == self.nickname:
+            return
+
+        if msg == '!botlist' or msg == '!rollcall':
+            if config.respond_to_rollcall:
+                await whoami(self, chan, source, msg)
+            return
+
+        if not chan in self.asleep:
+            self.asleep[chan] = time.time()
+
+        for i in self.handle_reg:
+            # (<regex>, <function>)
+            if not self.handle_reg[i][0].match(msg):
+                continue
+            await self.handle_reg[i][1](self, chan, source, msg)
+
+        if not msg[:len(self.prefix)] == self.prefix:
+            return
+
+        msg = msg[len(self.prefix):]
+        cmd = msg.split(' ')[0]
+        msg = msg[len(cmd) + 1:]
+
+        # check if the command might be an alias
+        matches = {k for k, v in self.aliases.items() if cmd in v}
+        if len(matches) > 0 and cmd not in self.handle_cmd:
+            cmd = list(matches)[0]
+
+        if cmd in self.handle_cmd:
+            self.log('irc', 'recieved command "{} {}" from "{}" in "{}"'
+                .format(cmd, msg, source, chan))
+            func = self.handle_cmd[cmd]
+
+            if self.asleep[chan] < time.time() or cmd == 'admin':
+                try:
+                    await handlers.execute(self, func, chan, source, msg)
+                except Exception as e:
+                    traceback.print_tb(e.__traceback__)
+                    if func in self.fndata:
+                        module = self.fndata[func]['module']
+                    else:
+                        module = 'oops'
+                    await out.msg(self, module, chan,
+                        ['segmentation fault', repr(e)])
+                    return
+
+    async def is_admin(self, nickname):
+        info = await self.whois(nickname)
+        # check if they are identified
+        if not 'account' in info:
+            return False
+
+        return info['account'] in config.admins
+
+    async def on_private_message(self, chan, source, msg):
+        await super().on_private_message(chan, source, msg)
+        await self.on_channel_message(source, source, msg)
+
+    async def on_user_mode_change(self, modes):
+        await super().on_user_mode_change(modes)
+        self.log('irc', 'mode changed: {}'.format(modes))
+
+    def log(self, mod, txt):
+        now = datetime.datetime.now()
+        fmt = datetime.datetime.strftime(now, '%Y-%M-%dT%H:%m:%SZ')
+        print(f'{fmt}: [{mod}]: {txt}')
+
+if __name__ == '__main__':
+    client = SIGSEGV(config.nickname, realname=config.realname,
+        sasl_username=config.username, sasl_password=secrets.sasl_password,
+        sasl_identity=config.username)
+    client.prefix = config.prefix
+    client.asleep = {}
+    client.run(config.server, tls=config.tls, tls_verify=config.tls_verify)
