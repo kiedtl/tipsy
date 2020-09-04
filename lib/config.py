@@ -1,10 +1,11 @@
 botmaster = "kiedtl"
+botchannel = "#sigsegv"
 email = ["kiedtl", "tilde.team"]
-upstream = ["https://github.com/", "kiedtl", "/ircbot"]
+upstream = ["none"]
 
-nickname = "sigsegv"
+nickname = "vipts"
 username = "kiedtl_bots"
-realname = "a bot with some useful functions and tons of useless ones"
+realname = "vim tips"
 server = "localhost"
 tls = False
 tls_verify = False
@@ -13,7 +14,8 @@ join_on_invite = True
 respond_to_rollcall = True
 set_botmode = True
 
-prefix = ":"
+prefix = "\""
+
 admins = [
     "kiedtl",
     "spacehare",
@@ -28,19 +30,7 @@ admins = [
 
 bannedchans = ["#meta"]
 
-# channels that are joined only when the
-# `:admin joins` command is issued
-prod_chans = [
-    "#team",
-    "#lickthecheese",
-    "#chaos",
-    "#unruly",
-    "#koth",
-    "#ricing",
-    "#lounge",
-]
-
 # channels that are joined initially
-initial_chans = ["#bots", "#spacehare", "#sigsegv"]
+initial_chans = ["#bots", botchannel]
 
-quitmsg = "I'll be back"
+quitmsg = ":wq!"

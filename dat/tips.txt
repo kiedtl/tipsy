@@ -1,5 +1,3 @@
-# basic
-
 	vimtutor
 starts vim editing a copy of a tutorial file -- very good.
 	i
@@ -51,8 +49,6 @@ change to end of line (same as c$)
 	ce
 change to end of word (a complete change command)
 
-# explore
-
 	:Ex
 file explorer note capital Ex
 	\be
@@ -61,8 +57,6 @@ show buffer explorer (requires plugin)
 list of buffers (eg following)
 	:cd ..
 move to parent directory
-
-# misc editing
 
 	guu
 lowercase line
@@ -91,8 +85,6 @@ insert 25 into text
 	G=gg
 auto (re)indent entire document
 
-# easter eggs
-
 	:help 42
 	:help holy-grail
 	:help!
@@ -102,8 +94,6 @@ auto (re)indent entire document
 	:help showmatch (read the note)
 	:Ni!
 	:help bar
-
-# movement
 
 	'.
 jump to last modification line
@@ -115,8 +105,6 @@ retrace your movements in file (backward)
 retrace your movements in file (forward)
 	:ju(mps)
 list of your movements {{help|jump-motions}}
-
-# maps
 
 	:map <F7>  :'a,'bw file
 Write the lines from mark a to mark b to 'file'
@@ -131,14 +119,10 @@ list abbreviations beginning with php
 	:map \
 list maps beginning with \
 
-# registers
-
 	:reg
 display contents of all registers
 	"1p
 paste from register 1
-
-# shell interaction
 
 	:r!ls
 reads in output of ls (use dir on Windows)
@@ -176,8 +160,6 @@ sort selected lines
 	!grep word
 keep only lines containing 'word' in the selected range.
 
-# multiple files
-
 	:wn
 write file and move to next (SUPER)
 	:bd
@@ -213,8 +195,6 @@ open new tab page (Ctrl-PgUp, Ctrl-PgDown for next/previous tab)
 	:tabm n
 move tab to position n (0=leftmost position)
 
-# recording
-
 	qa
 record keystrokes to register "a"
 	q
@@ -222,17 +202,12 @@ quit recording
 	@a
 execute commands again in "a"
 
-# vimrc essentials
-
 	:set incsearch
 jumps to search word as you type (annoying but excellent)
 	:set wildignore=*.o,*.obj,*.bak,*.exe
 should be obvious
 	:syntax on
 display syntactical elements by color based on filetype (extension)
-
-# searching
-
 	/^fred.*joe.*bill
 line beginning with fred, followed by joe then bill
 	/^[A-J]
@@ -246,8 +221,6 @@ fred then any whitespace (including newlines) then joe
 	/fred\|joe
 fred OR joe
 
-# substitution
-
 	:%s/^\(.*\)\n\(\1\n\)*/\1\r/
 delete multiple adjacent duplicate lines
 	:%s/fred/joe/igc
@@ -258,14 +231,10 @@ delete DOS Carriage Returns (^M)
 VERY USEFUL
 	:s/\(.*\):\(.*\)/\2 : \1/
 reverse fields separated by :
-
-:s/fred/<c-r>a/g
+	:s/fred/<c-r>a/g
 substitute "fred" with contents of register "a"
-:%s/^\(.*\)\n\1/\1$/
+	:%s/^\(.*\)\n\1/\1$/
 delete duplicate lines
-
-# Global command
-
 	:g/one\|two/
 list lines containing "one" or "two"
 	:g/^\s*$/d
@@ -279,23 +248,10 @@ not line based
 	:v/./.,/./-1join
 compress empty lines
 
-# Formatting text
-
 	gq<CR>
 format text.
 	gqap
 (a is motion p paragraph (visual mode))
-
-# Operate command over multiple files
-
-	:bufdo %s/foo/bar/
-execute %s/foo/bar/ over buffer
-	:windo %s/foo/bar/
-execute %s/foo/bar/ over window
-	:tabdo %s/foo/bar/
-execute %s/foo/bar/ over tab
-
-# Help for help
 
 	:h visual<C-D><Tab>
 obtain list of all visual help topic, then use tab to step through them
@@ -315,17 +271,6 @@ help for say <C-R> in command mode
 visual mode
 	:h 'ai
 help on setting option 'autoindent'
-
-# lines in buffer
-
-	:%! nl -ba
-number the lines in the file
-	:%!cat -n
-number the lines in the file
-
-To display how many lines are in the current buffer, type Ctrl-g (or g then Ctrl-g for more information).
-
-# misc
 
 	* # g* g#
 find word under cursor (forwards/backwards)
@@ -351,4 +296,16 @@ type control-D and get a list all help topics containing slash (plus use TAB for
 list of all your commands
 	"ayy@a
 execute the Vim command in the current line
+	:%! nl -ba
+number the lines in the file
+	:%!cat -n
+number the lines in the file
+
+To display how many lines are in the current buffer, type Ctrl-g (or g then Ctrl-g for more information).
+	:bufdo %s/foo/bar/
+execute %s/foo/bar/ over buffer
+	:windo %s/foo/bar/
+execute %s/foo/bar/ over window
+	:tabdo %s/foo/bar/
+execute %s/foo/bar/ over tab
 
