@@ -3,9 +3,9 @@ botchannel = "#sigsegv"
 email = ["kiedtl", "tilde.team"]
 upstream = ["none"]
 
-nickname = "vipts"
+nickname = "tipsy"
 username = "kiedtl_bots"
-realname = "vim tips"
+realname = "(Neo)Vim tips!"
 server = "localhost"
 tls = False
 tls_verify = False
