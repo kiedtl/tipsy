@@ -14,7 +14,7 @@ join_on_invite = True
 respond_to_rollcall = True
 set_botmode = True
 
-prefix = "\""
+prefix = '"'
 
 admins = [
     "kiedtl",
