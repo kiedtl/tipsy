@@ -20,10 +20,13 @@ async def ping(self, chan, src, msg):
 
 async def whoami(self, chan, src, msg):
     owner = common.nohighlight(config.botmaster)
-    email = common.nohighlight(config.email[0]) + "‍＠‍" + config.email[1]
-    source = "".join([common.nohighlight(i) for i in config.upstream])
     await out.msg(self, "who", chan, [f"I'm {self.nickname}, {owner}'s bot."])
-    await out.msg(self, "who", chan, [f"upstream: {source}"])
+
+    if not config.upstream == None:
+        source = "".join([common.nohighlight(i) for i in config.upstream])
+        await out.msg(self, "who", chan, [f"upstream: {source}"])
+
+    email = common.nohighlight(config.email[0]) + "‍＠‍" + config.email[1]
     await out.msg(self, "who", chan, [f"reporting issues: {email}"])
     await out.msg(self, "who", chan, [f"for usage info, try {config.prefix}help"])
 

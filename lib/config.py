@@ -1,7 +1,7 @@
 botmaster = "kiedtl"
 botchannel = "#sigsegv"
 email = ["kiedtl", "tilde.team"]
-upstream = ["none"]
+upstream = None
 
 nickname = "tipsy"
 username = "kiedtl_bots"
