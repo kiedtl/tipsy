@@ -27,13 +27,13 @@ while line_i < len(lines):
         description = lines[line_i + 1]
         snippet = line[1:]
         db['tips'].insert(dict(date=0, author_nick=None,
-            author_account=None, author_username=None,
+            author_account=None, author_username="Vim Tips Wiki",
             tiptype=TIP_TYPES['snippet'],
             snippet=snippet, snippet_desc=description))
         line_i += 1
     else:
         db['tips'].insert(dict(date=0, author_nick=None,
-            author_account=None, author_username=None,
+            author_account=None, author_username="Vim Tips Wiki",
             tiptype=TIP_TYPES['text'], text=line))
     line_i += 1
 

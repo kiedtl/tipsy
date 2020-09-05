@@ -1,8 +1,11 @@
 import handlers
+from datetime import timedelta
+from babel.dates import format_timedelta
 import dataset
 import datetime
 import out
 import random
+import common
 
 modname = "vim tips"
 tipdb = dataset.connect('sqlite:///dat/tips.db')
@@ -16,14 +19,27 @@ TIP_TYPES = {
 
 def format_tip(tip):
     text = ['']
-    author = tip['author_username']
-    if not author == None:
-        text[0] = f'({author}) '
+
     if tip['tiptype'] == TIP_TYPES['snippet']:
         text[0] += '{}:'.format(tip['snippet_desc'])
         text.append('    {}'.format(tip['snippet']))
     elif tip['tiptype'] == TIP_TYPES['text']:
         text[0] += '{}'.format(tip['text'])
+
+    text.append('[{}]'.format(tip['id']))
+
+    if not tip["date"] == None and not tip["date"] == 0:
+        # format added date nice (e.g. "added 5m ago")
+        last_fed_unix = int(tip["date"])
+        last_fed_date = datetime.datetime.fromtimestamp(last_fed_unix)
+        since = datetime.datetime.now() - last_fed_date
+        since_delta_fmt = format_timedelta(since, locale="en_US")
+        text[-1] += f' added {since_delta_fmt} ago'
+
+    author = tip['author_username']
+    if not author == None:
+        text[-1] += ' ({}) '.format(common.nohighlight(author))
+
     return text
 
 
@@ -80,6 +96,29 @@ async def submit_text_tip(self, ch, src, msg, args, opts):
     await out.msg(self, modname, ch, ['added text tip'])
 
 
+async def delete_tip(self, ch, src, msg, args, opts):
+    """
+    :hook: cmd
+    :name: rmtip
+    :help: delete a tip by id (requires +h)
+    :args: id:int
+    :require_hop:
+    """
+    try:
+        tipid = int(msg.split()[0].strip())
+    except:
+        await out.msg(self, modname, ch, ['invalid tip id.'])
+        return
+
+    target = tipslist.find_one(id=tipid)
+    if not target == None:
+        tipslist.delete(id=tipid)
+        await out.msg(self, modname, ch, [f'removed tip {tipid} (was "{target}")'])
+    else:
+        await out.msg(self, modname, ch, [f'no such tip with id "{tipid}"'])
+
+
 async def init(self):
     handlers.register(self, modname, random_tip)
     handlers.register(self, modname, submit_text_tip)
+    handlers.register(self, modname, delete_tip)
